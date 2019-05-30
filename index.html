@@ -1,0 +1,308 @@
+<html>
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Table Firebase</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+ <script defer src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
+ <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+</head>
+<body>
+ <section class="section">
+ <div class="container">
+ <h1 class="title">
+ Контакты
+ </h1>
+ <div class="content">
+ <button id="btnAdd" class="button"><i class="fa fa-plus"></i>Добавить контакт</button>
+ </div>
+ <div class="content">
+                <div class="form-group">
+                    <select class  ="form-control" name="state" id="maxRows">
+                         <option value="5000">Show ALL Rows</option>
+                         <option value="5">5</option>
+                         <option value="10">10</option>
+                         <option value="15">15</option>
+                         <option value="20">20</option>
+                         <option value="50">50</option>
+                         <option value="70">70</option>
+                         <option value="100">100</option>
+                        </select>
+                    
+                </div>
+
+    <input id="myInput" type="text" placeholder="Search..">
+    <table class="order-table table" id="table-id">
+  <thead class="thead-dark" id="table">
+      <tr>
+        <th scope="col">Name:</th>
+        <th scope="col">Email:</th> 
+        <th scope="col">Pic:</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+      <tbody id="card-list">
+      </tbody>
+    </table>
+            <div class='pagination-container' >
+                <nav>
+                  <ul class="pagination">
+                        <li data-page="prev" ><span> < <span class="sr-only">(current)</span></span></li>
+                        <li data-page="next" id="prev"><span> > <span class="sr-only">(current)</span></span></li>
+                  </ul>
+                </nav>
+            </div>
+
+</div>
+    
+ </div>
+ </div>
+ <div id="modal" class="modal">
+ <div class="modal-background"></div>
+ <div class="modal-card">
+ <header class="modal-card-head">
+ <p class="modal-card-title">Contact Form</p>
+ <button class="btnClose delete" aria-label="close"></button>
+ </header>
+ <section class="modal-card-body">
+ <div class="field">
+ <label class="label">Name</label>
+ <div class="control">
+ <input type="hidden" id="txtType">
+ <input type="hidden" id="txtKey">
+ <input class="input" id="txtName" type="text" placeholder="Name">
+ </div>
+ <p class="help"> </p>
+ </div>
+ <div class="field">
+ <label class="label">Email</label>
+ <div class="control">
+ <input class="input" id="txtEmail" type="text" placeholder="Email">
+ </div>
+ <p class="help"> </p>
+ </div>
+ <div class="field">
+ <label class="label">Profile Picture</label>
+ <div class="control">
+ <input class="input" id="txtPic" type="text" placeholder="Profile picture url">
+ </div>
+ <p class="help"></p>
+ </div>
+ </section>
+ <footer class="modal-card-foot">
+ <button id="btnSave" class="button is-success">Save changes</button>
+ <button id="btnClose" class="button">Cancel</button>
+ </footer>
+ </div>
+ </div>
+ </section>
+
+ <style>
+.pagination li:hover{
+    cursor: pointer;
+}
+ </style>
+ <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+ integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+ crossorigin="anonymous"></script>
+ <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+ <script>
+ var nextkey =0;
+ var firebaseConfig = {
+    apiKey: "AIzaSyBSWFK3i8tp6PwX0TVMPK8613yuqqJZhWc",
+    authDomain: "datatable-54557.firebaseapp.com",
+    databaseURL: "https://datatable-54557.firebaseio.com",
+    projectId: "datatable-54557",
+    storageBucket: "datatable-54557.appspot.com",
+    messagingSenderId: "1013895628287",
+    appId: "1:1013895628287:web:a24c3f4371234ece"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+ var database = firebase.database();
+ var book = [];
+ var i = 0;
+ database.ref('users').on('child_added', function(data) {
+    book.push(data);
+ add_data_table(data.val().username,data.val().profile_picture,data.val().email,data.key);
+ var lastkey = data.key;
+ nextkey = parseInt(lastkey)+1;
+console.log(book[i].val());
+ console.log(book.length);
+i += 1;
+ });
+ database.ref('users').on('child_changed', function(data) {
+ update_data_table(data.val().username,data.val().profile_picture,data.val().email,data.key)
+ });
+ database.ref('users').on('child_removed', function(data) {
+ remove_data_table(data.key)
+ });
+ 
+ function add_data_table(name,pic,email,key){
+ $("#card-list").append('<tr class="key" id="'+key+'"><td><div class="book-pic">'+pic+'</div></td><td><div class="name">'+name+'</div></td><td><div class="book">'+email+'</div></td><td><button><a href="#" data-key="'+key+'" class="card-footer-item btnEdit">Edit</a></button></td><td><button><a href="#" class="card-footer-item btnRemove"  data-key="'+key+'">Remove</a></button></td></div></tr></tr>');
+ getPagination('#table-id');
+
+ }
+ function update_data_table(name,pic,email,key){
+$("#card-list #"+key).html('<td><div class="book-pic">'+pic+'</div></td><td><div class="name">'+name+'</div></td><td><div class="book">'+email+'</div></td><td><button><a href="#" data-key="'+key+'" class="card-footer-item btnEdit">Edit</a></button></td><td><button><a href="#" class="card-footer-item btnRemove"  data-key="'+key+'">Remove</a></button></td>');
+ getPagination('#table-id');
+ }
+ function remove_data_table(key){
+$("#card-list #"+key).remove();
+ getPagination('#table-id');
+ }
+ function new_data(name,email,pic,key){
+ database.ref('users/' + key).set({
+ username: name,
+ email: email,
+ profile_picture : pic
+ });
+ }
+ function update_data(name,email,pic,key){
+ database.ref('users/' + key).update({
+ username: name,
+ email: email,
+ profile_picture : pic
+ });
+ }
+ $( "#btnAdd" ).click(function() {
+ $("#txtName").val("");
+ $("#txtEmail").val("");
+ $("#txtPic").val("");
+ $("#txtType").val("N");
+ $("#txtKey").val("0");
+ $( "#modal" ).addClass( "is-active" );
+ 
+ });
+ $("#btnSave" ).click(function() {
+ if($("#txtType").val() == 'N'){
+ database.ref('users').once("value").then(function(snapshot) {
+ if(snapshot.numChildren()==0){
+ nextkey = 1;
+ }
+ new_data($("#txtName").val(),$("#txtEmail").val(),$("#txtPic").val(),nextkey);
+ });
+ }else{
+ update_data($("#txtName").val(),$("#txtEmail").val(),$("#txtPic").val(),$("#txtKey").val());
+ }
+ $("#btnClose").click();
+ });
+ $(document).on("click",".btnEdit",function(event){
+ event.preventDefault();
+ key = $(this).attr("data-key");
+ database.ref('users/'+key).once("value").then(function(snapshot){
+ $("#txtName").val(snapshot.val().username);
+ $("#txtEmail").val(snapshot.val().email);
+ $("#txtPic").val(snapshot.val().profile_picture); 
+ $("#txtType").val("E"); 
+ $("#txtKey").val(key); 
+ });
+ $( "#modal" ).addClass( "is-active" );
+ });
+ 
+ $(document).on("click",".btnRemove",function(event){
+ event.preventDefault();
+ key = $(this).attr("data-key");
+ database.ref('users/' + key).remove();
+ })
+ 
+ $( "#btnClose,.btnClose" ).click(function() {
+ $( "#modal" ).removeClass( "is-active" );
+ });
+
+    function getPagination (table){
+
+    var lastPage = 1 ; 
+
+          $('#maxRows').on('change',function(evt){
+            //$('.paginationprev').html('');                       
+
+        lastPage = 1 ; 
+         $('.pagination').find("li").slice(1, -1).remove();
+            var trnum = 0 ;                                 
+            var maxRows = parseInt($(this).val());          
+
+            if(maxRows == 5000 ){
+
+                $('.pagination').hide();
+            }else {
+                
+                $('.pagination').show();
+            }
+
+            var totalRows = $(table+' tbody tr').length;        
+             $(table+' tr:gt(0)').each(function(){          
+                trnum++;                                   
+                if (trnum > maxRows ){                     
+                    
+                    $(this).hide();                         
+                }if (trnum <= maxRows ){$(this).show();}
+             });                                            
+             if (totalRows > maxRows){                      
+                var pagenum = Math.ceil(totalRows/maxRows); 
+                                                            
+                for (var i = 1; i <= pagenum ;){            
+                $('.pagination #prev').before('<li data-page="'+i+'">\
+                                      <span>'+ i++ +'<span class="sr-only">(current)</span></span>\
+                                    </li>').show();
+                }                                           
+            }                                               
+            $('.pagination [data-page="1"]').addClass('active'); 
+            $('.pagination li').on('click',function(evt){       
+                evt.stopImmediatePropagation();
+                evt.preventDefault();
+                var pageNum = $(this).attr('data-page');    
+
+                var maxRows = parseInt($('#maxRows').val());            
+
+                if(pageNum == "prev" ){
+                    if(lastPage == 1 ){return;}
+                    pageNum  = --lastPage ; 
+                }
+                if(pageNum == "next" ){
+                    if(lastPage == ($('.pagination li').length -2) ){return;}
+                    pageNum  = ++lastPage ; 
+                }
+
+                lastPage = pageNum ;
+                var trIndex = 0 ;                           
+                $('.pagination li').removeClass('active');   
+                $('.pagination [data-page="'+lastPage+'"]').addClass('active');
+                // $(this).addClass('active');                  
+                 $(table+' tr:gt(0)').each(function(){      
+                    trIndex++;                              
+                    if (trIndex > (maxRows*pageNum) || trIndex <= ((maxRows*pageNum)-maxRows)){
+                        $(this).hide();     
+                    }else {$(this).show();}                 
+                 });                                        
+                    });                                     
+
+        }).val(5).change();                             
+    }   
+
+
+$(document).ready(function(){
+  $("#myInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#table-id tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+       console.log($(this).toggle($(this).text().toLowerCase().indexOf(value)));
+    });
+  });
+});
+
+
+
+ </script>
+</body>
+</html>
