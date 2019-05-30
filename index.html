@@ -130,11 +130,16 @@
   firebase.initializeApp(firebaseConfig);
 
  var database = firebase.database();
+ var book = [];
+ var i = 0;
  database.ref('users').on('child_added', function(data) {
     book.push(data);
  add_data_table(data.val().username,data.val().profile_picture,data.val().email,data.key);
  var lastkey = data.key;
  nextkey = parseInt(lastkey)+1;
+console.log(book[i].val());
+ console.log(book.length);
+i += 1;
  });
  database.ref('users').on('child_changed', function(data) {
  update_data_table(data.val().username,data.val().profile_picture,data.val().email,data.key)
