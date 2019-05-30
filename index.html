@@ -131,6 +131,32 @@
 .panel-body{
   display: none;
 }
+  @keyframes ring {
+  5% {
+    transform: translateX(-1px);
+  }
+  
+  10% {
+    transform: translateX(2px);
+  }
+
+  15% {
+    transform: translateX(-4px);
+  }
+
+  20% {
+    transform: translateX(4px);
+  }
+    
+    21%, 100% {
+        transform: translateX(0);
+    }
+}
+.filter i {
+    animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite;
+    display: block;
+    display: block;
+}
  </style>
  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
