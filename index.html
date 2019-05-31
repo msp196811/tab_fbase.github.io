@@ -8,7 +8,10 @@
  <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
+<!-- Optional theme -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
 </head>
 <body>
  <section class="section">
@@ -50,9 +53,9 @@
     <table class="order-table table" id="table-id">
   <thead class="thead-dark" id="table">
       <tr>
-        <th scope="col">Имя:</th>
-        <th scope="col">Email:</th> 
-        <th scope="col">Телефон:</th>
+        <th scope="col" id="name">Имя:</th>
+        <th scope="col" id="email">Email:</th> 
+        <th scope="col" id="pic">Телефон:</th>
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
@@ -131,7 +134,7 @@
 .panel-body{
   display: none;
 }
-  @keyframes ring {
+@keyframes ring {
   5% {
     transform: translateX(-1px);
   }
@@ -156,6 +159,15 @@
     animation: ring 1s cubic-bezier(.36,.07,.19,.97) infinite;
     display: block;
     display: block;
+}
+#name{
+  cursor: pointer;
+}
+#email{
+  cursor: pointer;
+}
+#pic{
+  cursor: pointer;
 }
  </style>
  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
@@ -254,9 +266,11 @@ $("#card-list #"+key).remove();
  });
  
  $(document).on("click",".btnRemove",function(event){
- event.preventDefault();
- key = $(this).attr("data-key");
- database.ref('users/' + key).remove();
+ if(confirm("Точно удалить?")){
+  event.preventDefault();
+  key = $(this).attr("data-key");
+  database.ref('users/' + key).remove();
+ }
  })
  
  $( "#btnClose,.btnClose" ).click(function() {
@@ -395,6 +409,53 @@ $(function(){
   $('[data-toggle="tooltip"]').tooltip();
 })
 
+
+function sortTable(f,n){
+    var rows = $('#table-id tbody  tr').get();
+
+    rows.sort(function(a, b) {
+
+        var A = getVal(a);
+        var B = getVal(b);
+
+        if(A < B) {
+            return -1*f;
+        }
+        if(A > B) {
+            return 1*f;
+        }
+        return 0;
+    });
+
+    function getVal(elm){
+        var v = $(elm).children('td').eq(n).text().toUpperCase();
+        if($.isNumeric(v)){
+            v = parseInt(v,10);
+        }
+        return v;
+    }
+
+    $.each(rows, function(index, row) {
+        $('#table-id').children('tbody').append(row);
+    });
+}
+var f_sl = 1; // flag to toggle the sorting order
+var f_nm = 1; // flag to toggle the sorting order
+$("#name").click(function(){
+    f_sl *= -1; // toggle the sorting order
+    var n = $(this).prevAll().length;
+    sortTable(f_sl,n);
+});
+$("#email").click(function(){
+    f_nm *= -1; // toggle the sorting order
+    var n = $(this).prevAll().length;
+    sortTable(f_nm,n);
+});
+$("#pic").click(function(){
+    f_nm *= -1; // toggle the sorting order
+    var n = $(this).prevAll().length;
+    sortTable(f_nm,n);
+});
  </script>
 </body>
 </html>
