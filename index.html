@@ -53,9 +53,10 @@
     <table class="order-table table" id="table-id">
   <thead class="thead-dark" id="table">
       <tr>
-        <th scope="col" id="name">Имя:</th>
-        <th scope="col" id="email">Email:</th> 
-        <th scope="col" id="pic">Телефон:</th>
+        <th scope="col" id="name">Имя&#8597</th>
+        <th scope="col" id="email">Email&#8597</th> 
+        <th scope="col" id="pic">Телефон&#8597</th>
+        <th scope="col" id="dep">Должность&#8597</th>
         <th scope="col"></th>
         <th scope="col"></th>
       </tr>
@@ -105,6 +106,13 @@
  <label class="label">Телефон</label>
  <div class="control">
  <input class="input" id="txtPic" type="text" placeholder="Телефон">
+ </div>
+ <p class="help"></p>
+ </div>
+  <div class="field">
+ <label class="label">Должность</label>
+ <div class="control">
+ <input class="input" id="txtDep" type="text" placeholder="Должность">
  </div>
  <p class="help"></p>
  </div>
@@ -169,6 +177,9 @@
 #pic{
   cursor: pointer;
 }
+#dep{
+  cursor: pointer;
+}
  </style>
  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
@@ -192,48 +203,51 @@
 
  var database = firebase.database();
  database.ref('users').on('child_added', function(data) {
- add_data_table(data.val().username,data.val().email,data.val().pic,data.key);
+ add_data_table(data.val().username,data.val().email,data.val().pic,data.val().dep,data.key);
  var lastkey = data.key;
  nextkey = parseInt(lastkey)+1;
  });
  database.ref('users').on('child_changed', function(data) {
- update_data_table(data.val().username,data.val().email,data.val().pic,data.key)
+ update_data_table(data.val().username,data.val().email,data.val().pic,data.val().dep,data.key)
  });
  database.ref('users').on('child_removed', function(data) {
  remove_data_table(data.key)
  });
  
- function add_data_table(name,email,pic,key){
- $("#card-list").append('<tr class="key" id="'+key+'"><td><div class="book-pic">'+name+'</div></td><td><div class="name">'+email+'</div></td><td><div class="book">'+pic+'</div></td><td width="2%"><button class="btn btn-default"><a href="#" data-key="'+key+'" class="btnEdit">&#9997</a></button></td><td width="2%"><button class="btn btn-default"><a href="#" class="btnRemove"  data-key="'+key+'">&#128465</a></button></td></div></tr></tr>');
+ function add_data_table(name,email,pic,dep,key){
+ $("#card-list").append('<tr class="key" id="'+key+'"><td><div class="book-pic">'+name+'</div></td><td><div class="name">'+email+'</div></td><td><div class="book">'+pic+'</div></td><td><div class="dep">'+dep+'</div></td><td width="2%"><button class="btn btn-default"><a href="#" data-key="'+key+'" class="btnEdit">&#9997</a></button></td><td width="2%"><button class="btn btn-default"><a href="#" class="btnRemove"  data-key="'+key+'">&#128465</a></button></td></div></tr></tr>');
  getPagination('#table-id');
 
  }
- function update_data_table(name,email,pic,key){
-$("#card-list #"+key).html('<td><div class="book-pic">'+name+'</div></td><td><div class="name">'+email+'</div></td><td><div class="book">'+pic+'</div></td><td><button><a href="#" data-key="'+key+'" class="btnEdit">&#9997</a></button></td><td><button><a href="#" class="card-footer-item btnRemove"  data-key="'+key+'">&#128465</a></button></td>');
+ function update_data_table(name,email,pic,dep,key){
+$("#card-list #"+key).html('<td><div class="book-pic">'+name+'</div></td><td><div class="name">'+email+'</div></td><td><div class="book">'+pic+'</div></td><td><div class="dep">'+dep+'</div></td><td><button><a href="#" data-key="'+key+'" class="btnEdit">&#9997</a></button></td><td><button><a href="#" class="card-footer-item btnRemove"  data-key="'+key+'">&#128465</a></button></td>');
  getPagination('#table-id');
  }
  function remove_data_table(key){
 $("#card-list #"+key).remove();
  getPagination('#table-id');
  }
- function new_data(name,email,pic,key){
+ function new_data(name,email,pic,dep,key){
  database.ref('users/' + key).set({
  username: name,
  email: email,
- pic: pic
+ pic: pic,
+ dep: dep
  });
  }
- function update_data(name,email,pic,key){
+ function update_data(name,email,pic,dep,key){
  database.ref('users/' + key).update({
  username: name,
  email: email,
- pic: pic
+ pic: pic,
+ dep: dep
  });
  }
  $( "#btnAdd" ).click(function() {
  $("#txtName").val("");
  $("#txtEmail").val("");
  $("#txtPic").val("");
+  $("#txtDep").val("");
  $("#txtType").val("N");
  $("#txtKey").val("0");
  $( "#modal" ).addClass( "is-active" );
@@ -245,10 +259,10 @@ $("#card-list #"+key).remove();
  if(snapshot.numChildren()==0){
  nextkey = 1;
  }
- new_data($("#txtName").val(),$("#txtEmail").val(),$("#txtPic").val(),nextkey);
+ new_data($("#txtName").val(),$("#txtEmail").val(),$("#txtPic").val(), $("#txtDep").val(),nextkey);
  });
  }else{
- update_data($("#txtName").val(),$("#txtEmail").val(),$("#txtPic").val(),$("#txtKey").val());
+ update_data($("#txtName").val(),$("#txtEmail").val(),$("#txtPic").val(),$("#txtDep").val(),$("#txtKey").val());
  }
  $("#btnClose").click();
  });
@@ -258,7 +272,8 @@ $("#card-list #"+key).remove();
  database.ref('users/'+key).once("value").then(function(snapshot){
  $("#txtName").val(snapshot.val().username);
  $("#txtEmail").val(snapshot.val().email);
- $("#txtPic").val(snapshot.val().pic); 
+ $("#txtPic").val(snapshot.val().pic);
+ $("#txtDep").val(snapshot.val().dep);  
  $("#txtType").val("E"); 
  $("#txtKey").val(key); 
  });
@@ -380,7 +395,7 @@ $(document).ready(function(){
             })
             if($target.find('tbody tr:visible').size() === 0) {
               var col_count = $target.find('tr').first().find('td').size();
-              var no_results = $('<tr class="filterTable_no_results"><td colspan="'+col_count+'">No results found</td></tr>')
+              var no_results = $('<tr class="filterTable_no_results"><td colspan="'+col_count+'">Не нашло результатов</td></tr>')
               $target.find('tbody').append(no_results);
             }
              if($target.find('tbody tr:visible').size() <= $('#maxRows').val()){
@@ -456,6 +471,12 @@ $("#pic").click(function(){
     var n = $(this).prevAll().length;
     sortTable(f_nm,n);
 });
+$("#dep").click(function(){
+    f_nm *= -1; // toggle the sorting order
+    var n = $(this).prevAll().length;
+    sortTable(f_nm,n);
+});
  </script>
 </body>
+
 </html>
