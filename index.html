@@ -231,7 +231,7 @@
 
  }
  function update_data_table(name,email,pic,dep,selery,key){
-$("#card-list #"+key).html('<td><div class="book-pic">'+name+'</div></td><td><div class="name">'+email+'</div></td><td><div class="book">'+pic+'</div></td><td><div class="dep">'+dep+'</div></td></td><td><div class="selery">'+selery+'</div></td><td><button><a href="#" data-key="'+key+'" class="btnEdit">&#9997</a></button></td><td><button><a href="#" class="card-footer-item btnRemove"  data-key="'+key+'">&#128465</a></button></td>');
+$("#card-list #"+key).html('<td><div class="book-pic">'+name+'</div></td><td><div class="name">'+email+'</div></td><td><div class="book">'+pic+'</div></td><td><div class="dep">'+dep+'</div></td></td><td><div class="selery">'+selery+'</div></td><td width="2%"><button class="btn btn-default"><a href="#" data-key="'+key+'" class="btnEdit">&#9997</a></button></td><td width="2%"><button class="btn btn-default"><a href="#" class="btnRemove"  data-key="'+key+'">&#128465</a></button></td>');
  getPagination('#table-id');
  }
  function remove_data_table(key){
